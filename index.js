@@ -26,14 +26,13 @@ app.get('/', (req, res) => {
     res.render('home')
 })
 
-app.get('/makecampground', async (req, res) => {
-    try {
-    const camp = new Campground({ title: 'My Backyard', description: 'cheap camping!' });
-    await camp.save();
-    res.send(camp);
-    }catch (error) {
-        console.log(error);
-    }
+app.get('/campgrounds', async (req, res) => {
+    const campgrounds = await Campground.find({});//finds all campgrounds
+    res.render('campgrounds/index.ejs', { campgrounds })//pass campgrounds to template
+})
+app.get('/campgrounds/:id', async (req,res) => {
+    const campground = await Campground.findById(req.params.id)
+    res.render('campgrounds/show', { campground })
 })
 
 
