@@ -19,9 +19,11 @@
   "homepage": "https://github.com/charr1309/YelpCamp#readme",
   "dependencies": {
     "ejs": "^3.1.6",
+    "ejs-mate": "^3.0.0",
     "express": "^4.17.1",
     "method-override": "^3.0.0",
     "mongodb": "^3.6.9",
-    "mongoose": "^5.12.14"
+    "mongoose": "^5.12.14",
+    "morgan": "^1.10.0"
   }
 }

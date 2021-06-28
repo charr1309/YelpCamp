@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
+const ejsMate = require('ejs-mate');
 const Campground = require('./models/campground');
 const methodOverride = require('method-override');//allows us to alter the method for our form
 
@@ -19,6 +20,7 @@ db.once("open", () => {
 
 const app = express();
 
+app.engine('ejs', ejsMate);//template engine to use static template files to design HTML easier
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'))
 
@@ -36,7 +38,7 @@ app.get('/campgrounds', async (req, res) => {
 
 //this route below has to come before the :id route. If it doesnt the brower will match the :id route and since there is no new, id, you will get a time out error, so order does matter
 
-app.get('/campgrounds/new', (req,res) =>{//dont need async function here sinde its a form and wont be getting or posting until form is submitted
+app.get('/campgrounds/new', (req,res) =>{//dont need async function here since its a form and wont be getting or posting until form is submitted
     res.render('campgrounds/new');
 })
 
