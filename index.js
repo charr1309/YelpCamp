@@ -5,9 +5,9 @@ const ejsMate = require('ejs-mate');
 const Campground = require('./models/campground');
 const methodOverride = require('method-override');//allows us to alter the method for our form
 const catchAsync = require('./utils/catchAsync');
-const { campgroundSchema } = ('./schemas.js');
+const { campgroundSchema, reviewSchema } = require('./schemas.js');
 const ExpressError = require('./utils/ExpressError');
-
+const Review = require ('./models/review');
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
     useNewUrlParser: true,
@@ -40,6 +40,17 @@ const validateCampground = (req,res,next) => {
     }
     
 }
+
+const validateReview = (req,res,next) => {
+    const {error} = reviewSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(msg, 400)
+    } else {
+        next();
+    }
+}
+
 app.get('/', (req, res) => {
     res.render('home')
 })
@@ -90,6 +101,15 @@ app.delete('/campgrounds/:id', catchAsync(async (req ,res) => {
     const {id} = req.params;
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds');
+}))
+
+app.post('/campgrounds/:id/reviews', validateReview, catchAsync(async (req, res) => {
+    const campground = await Campground.findById(req.params.id);
+    const review = new Review(req.body.review);//in the form show page each input was givin a name where data was stored under review ie. name="review[rating]" so its all under the key of review once its been parsed
+    campground.reviews.push(review);//in campground model the property on the CampgroundSchema was set to reviews plural which is an array of id's that correspond to a review and the review id is pushed there
+    await review.save();
+    await campground.save();
+    res.redirect(`/campgrounds/${campground.id}`);//redirect to the show page
 }))
 
 app.all('*', (req,res,next) => {//order is important..this will only run if nothing is matched first and there was no response from any of them
