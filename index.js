@@ -100,7 +100,7 @@ app.put('/campgrounds/:id', validateCampground, catchAsync(async (req, res) => {
 
 app.delete('/campgrounds/:id', catchAsync(async (req ,res) => {
     const {id} = req.params;
-    await Campground.findByIdAndDelete(id);
+    await Campground.findByIdAndDelete(id);//findByIdAndDelete() triggers only the delete middleware, findOneAndDelete added to in campgrounds.js--if another delete or remove method is used, it will not trigger
     res.redirect('/campgrounds');
 }))
 
@@ -117,9 +117,12 @@ app.delete('/campgrounds/:id/reviews/:reviewId', catchAsync(async (req, res) => 
     //--the $pull operator removes from an existing array all instances of a value or values that match a specified condition--reviews is just an array of id's
     const {id, reviewId} = req.params;
     await Campground.findByIdAndUpdate(id, {$pull: {reviews: reviewId}})//removes reference from the array
-    await Review.findByIdAndDelete(req.params.reviewId);//delete entire review
+    await Review.findByIdAndDelete(req.params.reviewId);//delete entire review--function triggers the middleware, findOneAndDelete()
     res.redirect(`/campgrounds/${id}`);
 }))
+
+
+
 
 app.all('*', (req,res,next) => {//order is important..this will only run if nothing is matched first and there was no response from any of them
     next(new ExpressError('Page Not Found', 404))
