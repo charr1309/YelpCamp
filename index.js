@@ -113,6 +113,14 @@ app.post('/campgrounds/:id/reviews', validateReview, catchAsync(async (req, res)
     res.redirect(`/campgrounds/${campground.id}`);//redirect to the show page
 }))
 
+app.delete('/campgrounds/:id/reviews/:reviewId', catchAsync(async (req, res) => {
+    //--the $pull operator removes from an existing array all instances of a value or values that match a specified condition--reviews is just an array of id's
+    const {id, reviewId} = req.params;
+    await Campground.findByIdAndUpdate(id, {$pull: {reviews: reviewId}})//removes reference from the array
+    await Review.findByIdAndDelete(req.params.reviewId);//delete entire review
+    res.redirect(`/campgrounds/${id}`);
+}))
+
 app.all('*', (req,res,next) => {//order is important..this will only run if nothing is matched first and there was no response from any of them
     next(new ExpressError('Page Not Found', 404))
 })

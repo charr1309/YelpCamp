@@ -1,6 +1,6 @@
     <% layout('layouts/boilerplate')%>
     <div class="row">
-        <div class="col-6 offset-3">
+        <div class="col-6">
             <div class="card mb-3">
                 <img src="<%= campground.image %>" class="card-img-top" alt="...">
                 <div class="card-body">
@@ -20,6 +20,10 @@
             <div class="card-footer text-muted">
                 2 days ago
             </div>
+            
+        </div>
+    </div>
+        <div class="col-6">
             <h2>Leave a Review</h2>
             <form action="/campgrounds/<%=campground._id%>/reviews" method="POST" class="mb-3 validated-form" novalidate><%#--novalidate tells form not to validate with html validations--validated-form is in the boilerplate.ejs and tells the form to use the javascript set up with the class of validated-form%>
                 <div class="mb-3">
@@ -36,12 +40,18 @@
                 <button class="btn btn-success">Submit</button>
             </form>
             <% for(let review of campground.reviews) { %>
-                <div class="mb-3">
-                    <p>Rating: <%= review.rating %></p>
-                    <p>Review: <%= review.body %></p>
-                </div>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Rating: <%= review.rating %></h5>
+                        <p class="card-text">Review: <%= review.body %></p>
+                        <form action="/campgrounds/<%=campground._id%>/reviews/<%=review._id%>?_method=DELETE" method="POST">
+                            <button class="btn btn-sm btn-danger">Delete</button>
+                        </form><%#this form is in the for loop so the button will be on each review%>
+                    </div>
+                </div>                
             <% } %>
         </div>
-    </div>
+        
+    
     
     
