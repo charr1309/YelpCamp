@@ -2,10 +2,7 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
-<<<<<<< HEAD
 const session = require('express-session');
-=======
->>>>>>> e55ecbf84eca4c12ed3c4890bd2fc6a6a07034d7
 // const Campground = require('./models/campground');
 const ExpressError = require('./utils/ExpressError');
 const methodOverride = require('method-override');//allows us to alter the method for our form--still need method="POST" after _method
@@ -40,6 +37,18 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(express.urlencoded({ extended: true }))//must tell express to parse the body so use this or nothing will come back when you use req.body for anything
 app.use(methodOverride('_method'));//tell express to use methodOverride
 app.use(express.static(path.join(__dirname, 'public')))//added to tell express, with static assests to use the path to the public directory
+
+const sessionConfig = {//configure session which will be an object
+    secret: 'thisshouldbeabettersecret',
+    resave: false,//resave and saveUninitialized are required or will produce deprecation warnings in node window
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,//enabled by default--when included in the HTTP reaponse header, the cooke cannot be accessed through client side script (if browser supports this flag)--browser will not reveal the cookie to a third party
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,//1000ms in second, 60sec in a minute, 60min in an hour, 24hr in a day, 7days in a week--this calculates the number of miliseconds seconds in a week--date.now() is in miliseconds--this cookie expires in a week--if no expiration is supplied, a user could stay logged in forever and usually that is not what is wanted
+        maxAge: 1000 * 60 * 60 * 24 * 7//--in this case max age is set to a week also
+    }
+}
+app.use(session(sessionConfig))
 
 const validateCampground = (req,res,next) => {    
     const {error} = campgroundSchema.validate(req.body);
