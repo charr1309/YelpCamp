@@ -26,6 +26,7 @@ router.post('/', validateReview, catchAsync(async (req, res) => {
     campground.reviews.push(review);//in campground model the property on the CampgroundSchema was set to reviews plural which is an array of id's that correspond to a review and the review id is pushed there
     await review.save();
     await campground.save();
+    req.flash('success', 'Created new review!')
     res.redirect(`/campgrounds/${campground.id}`);//redirect to the show page
 }))
 
@@ -34,6 +35,7 @@ router.delete('/:reviewId', catchAsync(async (req, res) => {
     const {id, reviewId} = req.params;
     await Campground.findByIdAndUpdate(id, {$pull: {reviews: reviewId}})//removes reference from the array
     await Review.findByIdAndDelete(req.params.reviewId);//delete entire review--function triggers the middleware, findOneAndDelete()
+    req.flash('success', 'Successfully deleted the review')
     res.redirect(`/campgrounds/${id}`);
 }))
 

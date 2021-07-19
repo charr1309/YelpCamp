@@ -1,0 +1,26 @@
+<%#--if there is no success, it will be an empty array so the alert will show up with background but no image--checking to see if success has length (truthy) also will keep the alert from showing at all if there is no message%>
+<% if(success && success.length) {%>    
+    <%#alert-dismissible class adds extra padding to the right of the alert and positions the close button-- fade and show classes allow animation when dismissing them%>
+
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <%= success %>
+        
+        <%#--data-dismiss attribute triggers javaScript functionality--button element has to be used for proper behavior across all devices--aria-label attribute is used to define a string that labels the current element. Use it in cases where a text label is not visible on the screen. If there is visible text labeling the element, use aria-labelledby instead%>
+        
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            
+            <%#adding aria-hidden to an element removes that element and all of its children from the accessibility tree. This can improve the experience for assistive technology%>
+
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+<% } %>
+
+<% if(error && error.length) {%>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= error %>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+<% } %>

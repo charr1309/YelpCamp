@@ -3,6 +3,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
 const session = require('express-session');
+const flash = require('connect-flash');
 // const Campground = require('./models/campground');
 const ExpressError = require('./utils/ExpressError');
 const methodOverride = require('method-override');//allows us to alter the method for our form--still need method="POST" after _method
@@ -49,6 +50,14 @@ const sessionConfig = {//configure session which will be an object
     }
 }
 app.use(session(sessionConfig))
+app.use(flash());
+
+//below is the middleware defined before the routes--res.locals.success we will have access to in the template and will be accessible to every route and will be equal to whatever is in req.flash of ('success')--most of the time there will be nothing there(if we just flash something and redirect it there should be a message in there) but if there is, it will have access to it under the key success
+app.use((req,res,next) => {
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');//another flash message if there is anything the req.flash of (error), when that flash is created in campgrounds.js
+    next();
+})
 
 const validateCampground = (req,res,next) => {    
     const {error} = campgroundSchema.validate(req.body);
