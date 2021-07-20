@@ -11,8 +11,11 @@ const methodOverride = require('method-override');//allows us to alter the metho
 // const { campgroundSchema, reviewSchema } = require('./schemas.js');
 // const Review = require ('./models/review');
 
+const passport = require('passport');//allows us to plugin multiple strategies for authentication
+const LocalStrategy = require('passport-local')//has nothing to do with the passport-local-mongoose which is just in the user model--
+const User = require('./models/user');//the user model is passed into the LocalStrategy so it must be required
 
-const campgrounds = require('./routes/campgrounds');
+const campgrounds = require('./routes/campgrounds');//
 const reviews = require('./routes/reviews');//require contents of the reviews file in the folder routes which is the route
 
 
@@ -51,6 +54,16 @@ const sessionConfig = {//configure session which will be an object
 }
 app.use(session(sessionConfig))
 app.use(flash());
+
+app.use(passport.initialize());//In a Connect or Express-based application, passport.initialize() middleware is required to initialize Passport. If your application uses persistent login sessions, passport.session() middleware must also be used.--the alternative would be to have to log in on every single request if its not persistent--app.use(session(sessionConfig)) above must be used before app.use(passport.session())
+app.use(passport.session());
+
+
+passport.use(new LocalStrategy(User.authenticate()));//tells passport to use the LocalStrategy required from above and on the User model, there will be an authentication method called authenticate--authenticate() is a static method automatically added to passport--it generates a function that is used in Passports LocalStategy--there is no authenticate property on the user model created by me, it is already there by default--can have more LocalStrategies going a once 
+
+passport.serializeUser(User.serializeUser());//serializeUser() generates a function that is used by Passport to serialize users into the session--also comes with passport by default like authenticate()--tells passport how you get a user into the session or store it
+
+passport.deserializeUser(User.deserializeUser());//conversly, deserializeUser() tells passport how to get a user out of a session or unstore it
 
 //below is the middleware defined before the routes--res.locals.success we will have access to in the template and will be accessible to every route and will be equal to whatever is in req.flash of ('success')--most of the time there will be nothing there(if we just flash something and redirect it there should be a message in there) but if there is, it will have access to it under the key success
 app.use((req,res,next) => {
