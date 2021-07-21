@@ -15,8 +15,9 @@ const passport = require('passport');//allows us to plugin multiple strategies f
 const LocalStrategy = require('passport-local')//has nothing to do with the passport-local-mongoose which is just in the user model--
 const User = require('./models/user');//the user model is passed into the LocalStrategy so it must be required
 
-const campgrounds = require('./routes/campgrounds');//
-const reviews = require('./routes/reviews');//require contents of the reviews file in the folder routes which is the route
+const userRoutes = require('./routes/users');
+const campgroundRoutes = require('./routes/campgrounds');//
+const reviewRoutes = require('./routes/reviews');//require contents of the reviews file in the folder routes which is the route
 
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
@@ -93,8 +94,9 @@ const validateCampground = (req,res,next) => {
 //     }
 // }
 
-app.use('/campgrounds', campgrounds);//tells express that any route that starts with /campgrounds, to use the campgrounds routes in campgrounds.js--since this will start all of the routes with /campgrounds here, the /campgrounds will be removed from the routes in campgrounds.js file
-app.use('/campgrounds/:id/reviews', reviews);//to have access to the :id part of this route, merge params must be in the parenthesis of the router statement at the top of the reviews.js file like so:   const router = express.Router({mergeParams: true});
+app.use('/', userRoutes);
+app.use('/campgrounds', campgroundRoutes);//tells express that any route that starts with /campgrounds, to use the campgrounds routes in campgrounds.js--since this will start all of the routes with /campgrounds here, the /campgrounds will be removed from the routes in campgrounds.js file
+app.use('/campgrounds/:id/reviews', reviewRoutes);//to have access to the :id part of this route, merge params must be in the parenthesis of the router statement at the top of the reviews.js file like so:   const router = express.Router({mergeParams: true});
 
 
 app.get('/', (req, res) => {
