@@ -66,8 +66,9 @@ passport.serializeUser(User.serializeUser());//serializeUser() generates a funct
 
 passport.deserializeUser(User.deserializeUser());//conversly, deserializeUser() tells passport how to get a user out of a session or unstore it
 
-//below is the middleware defined before the routes--res.locals.success we will have access to in the template and will be accessible to every route and will be equal to whatever is in req.flash of ('success')--most of the time there will be nothing there(if we just flash something and redirect it there should be a message in there) but if there is, it will have access to it under the key success
+//below is the middleware defined before the routes--res.locals.success we will have access to in the template and will be accessible to every route and will be equal to whatever is in req.flash of ('success')--most of the time there will be nothing there(if we just flash something and redirect it there should be a message in there) but if there is, it will have access to it under the key success--they are globals so there is access to them in every template
 app.use((req,res,next) => {
+    res.locals.currentUser = req.user;//(lecture# 512) this line makes all templates have access to req.user which passport automatically filled in with the deserialized value from the session--the session stores the serialized user and passport deserializes it and fills in req.user with that data which is userId, username and email--it doesnt show the hash, salt password data
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');//another flash message if there is anything the req.flash of (error), when that flash is created in campgrounds.js
     next();
