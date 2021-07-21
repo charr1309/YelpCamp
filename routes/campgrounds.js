@@ -18,7 +18,7 @@ const validateCampground = (req,res,next) => {
 }
 
 //moved campground routes to this campgrounds.js file in the routes folder so /campgrounds is removed now that they are connected in the index.js file via app.use('campgrounds', campgrounds)
-router.get('/', async (req, res) => {
+router.get('/', isLoggedIn, async (req, res) => {
     const campgrounds = await Campground.find({});//finds all campgrounds
     res.render('campgrounds/index.ejs', { campgrounds })//pass campgrounds to template
 })
