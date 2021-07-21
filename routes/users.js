@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const passport = require('passport');
 const catchAsync = require('../utils/catchAsync');//require to catch any mongoose errors
 const User = require('../models/user');
 
@@ -26,5 +27,21 @@ router.post('/register', catchAsync(async (req, res) => {//wrap function in catc
     }
     
 }));
+
+//2 login routes, one will serve a form and the other will be a post for /login as well which will do the actual logging in when it makes sure your credentials are valid
+
+router.get('/login', (req, res) => {
+    res.render('users/login');
+})
+
+router.post('/login', passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }), (req, res) => {//passport.authenticate, using the local strategy, with failureFlash a message if there is an error and failureRedirect back to the login page if there are any errors, options
+
+//next if the user makes it into the area below that means the user has been authenticated and is entering correctly
+
+    req.flash('success', 'Welcome Back');
+    res.redirect('/campgrounds');
+    
+
+})
 
 module.exports = router;
