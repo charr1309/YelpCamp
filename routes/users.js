@@ -45,7 +45,9 @@ router.post('/login', passport.authenticate('local', { failureFlash: true, failu
 //next if the user makes it into the area below that means the user has been authenticated and is entering correctly
 
     req.flash('success', 'Welcome Back');
-    res.redirect('/campgrounds');
+    const redirectUrl = req.session.returnTo || '/campgrounds';
+    delete req.session.returnTo
+    res.redirect(redirectUrl);
 })
 
 router.get('/logout', (req, res) => {
