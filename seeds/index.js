@@ -25,6 +25,7 @@ const seedDB = async () => {
         const random1000 = Math.floor(Math.random() * 1000);
         const price = Math.floor(Math.random() * 20) + 10;
         const camp = new Campground({
+            author: '60f8058dc1dd64658e90ebae',//--lecture 515--pulled an id from the database and set all campgrounds to have an author with that id--step 2 after adding an author property to the campground schema in models/campground.js--now run node seeds/index.js to re-seed the database and all the campgrounds will have an author with the ID of the ID pulled from the database--right now all campgrounds belong to the same author
            location: `${cities[random1000].city}, ${cities[random1000].state}`,
            title: `${sample(descriptors)} ${sample(places)}`, 
            image: 'https://source.unsplash.com/collection/483251',

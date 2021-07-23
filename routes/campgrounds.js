@@ -38,14 +38,16 @@ router.post('/', isLoggedIn, validateCampground, catchAsync(async(req,res,next) 
     //if(!req.body.campground) throw new ExpressError('Invalid campground data', 400);-- this line just checks to see if the req.body has campground--adding Joi for validation will allow much more detail validation for all values--campground is the key and all the values are under campground (ex. campground[price] or campground[description] etc.)--moved the joi schema from below to a function about so it can just be called on the other routes
         
     const campground = new Campground(req.body.campground);
+    campground.author = req.user._id;//associate the author with newly created campgrounds--req.user is automatically added in
     await campground.save();
     req.flash('success', 'Successfully made a new campground!');//installing connect-flash allows flash messages to be displayed to the user--want to use after the save in case there are any errors thrown--after the message you want to redirect--after the redirect you want to display that message in the template you redirect to--it could be added to the show routes individually but instead its added to the middleware that will take everything on every request and show the message--middleware will be defined in index.js to make this possible
     res.redirect(`/campgrounds/${campground._id}`)
 }))
 
 router.get('/:id', catchAsync(async (req,res) => {
-    const campground = await Campground.findById(req.params.id).populate('reviews');
-    if(!campground) {
+    const campground = await Campground.findById(req.params.id).populate('reviews').populate('author');//adding .populate gives the campground access to the reviews for that campground and the author so it is displayed on the show page for that campground--author is available to the campground under the key author.username
+    console.log(campground);
+        if(!campground) {
         req.flash('error', 'Cannot find that campground!');
         return res.redirect('/campgrounds');
     }

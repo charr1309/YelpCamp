@@ -8,6 +8,10 @@ const CampgroundSchema = new Schema({
     price: Number,
     description: String,
     location: String,
+    author: {//add Id to the schema so that the author of a post can be used for authentication--will be a reference to the user
+        type: Schema.Types.ObjectId,
+        ref: 'User' 
+    },
     reviews: [
         {
             type: Schema.Types.ObjectId,
