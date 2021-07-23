@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router({mergeParams: true});//express router likes to keep params seperate so mergeParams: true is required to access reviews for each campground since the reviews routes are in a different file in the routes folder
-const {isLoggedIn, validateReview} = require('../middleware');
+const {isLoggedIn, validateReview, isReviewAuthor} = require('../middleware');
 const Campground = require('../models/campground');
 const Review = require ('../models/review');
 
@@ -23,7 +23,7 @@ router.post('/', isLoggedIn, validateReview, catchAsync(async (req, res) => {
     res.redirect(`/campgrounds/${campground.id}`);//redirect to the show page
 }))
 
-router.delete('/:reviewId', catchAsync(async (req, res) => {
+router.delete('/:reviewId', isLoggedIn, isReviewAuthor, catchAsync(async (req, res) => {
     //--the $pull operator removes from an existing array all instances of a value or values that match a specified condition--reviews is just an array of id's
     const {id, reviewId} = req.params;
     await Campground.findByIdAndUpdate(id, {$pull: {reviews: reviewId}})//removes reference from the array

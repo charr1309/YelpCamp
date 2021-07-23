@@ -37,8 +37,13 @@ router.post('/', isLoggedIn, validateCampground, catchAsync(async(req,res,next) 
 }))
 
 router.get('/:id', catchAsync(async (req,res) => {
-    const campground = await Campground.findById(req.params.id).populate('reviews').populate('author');//adding .populate gives the campground access to the reviews for that campground and the author so it is displayed on the show page for that campground--author is available to the campground under the key author.username
-    // console.log(campground);
+    const campground = await Campground.findById(req.params.id).populate({
+        path:'reviews',
+        populate: {//set an object on this nested populate--populate all the reviews on the show page for the campground we are finding, populate the reviews, then populate their author, and then seperately below in the second populate, populate the author of this campground 
+            path: 'author'
+        }
+    }).populate('author');//adding .populate gives the campground access to the reviews for that campground and the author so it is displayed on the show page for that campground--author is available to the campground under the key author.username--reviews and author are 2 fields that are on campground--to put the name of the reviewer on each review, we want to populate the reviews author
+     console.log(campground);
         if(!campground) {
         req.flash('error', 'Cannot find that campground!');
         return res.redirect('/campgrounds');
