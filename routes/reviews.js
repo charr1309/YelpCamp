@@ -1,23 +1,15 @@
 const express = require('express');
 const router = express.Router({mergeParams: true});//express router likes to keep params seperate so mergeParams: true is required to access reviews for each campground since the reviews routes are in a different file in the routes folder
-
+const {validateReview} = require('../middleware')
 const Campground = require('../models/campground');
 const Review = require ('../models/review');
 
-const { reviewSchema } = require('../schemas.js');
+
 
 const ExpressError = require('../utils/ExpressError');
 const catchAsync = require('../utils/catchAsync');//need 2 dots since this file is nested in the routes folder
 
-const validateReview = (req,res,next) => {
-    const {error} = reviewSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',')
-        throw new ExpressError(msg, 400)
-    } else {
-        next();
-    }
-}
+
 
 
 router.post('/', validateReview, catchAsync(async (req, res) => {

@@ -1,21 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const catchAsync = require('../utils/catchAsync');//need 2 dots since this file is nested in the routes folder
-const ExpressError = require('../utils/ExpressError');
-const Campground = require('../models/campground');
-const { campgroundSchema } = require('../schemas.js');
-const { isLoggedIn } = require('../middleware');
 
-const validateCampground = (req,res,next) => {    
-    const {error} = campgroundSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',')
-        throw new ExpressError(msg, 400)
-    } else {
-        next();
-    }
-    
-}
+const Campground = require('../models/campground');
+
+const { isLoggedIn, isAuthor, validateCampground, validateReview } = require('../middleware');
+
+
+
 
 //moved campground routes to this campgrounds.js file in the routes folder so /campgrounds is removed now that they are connected in the index.js file via app.use('campgrounds', campgrounds)
 router.get('/', isLoggedIn, async (req, res) => {
@@ -46,7 +38,7 @@ router.post('/', isLoggedIn, validateCampground, catchAsync(async(req,res,next) 
 
 router.get('/:id', catchAsync(async (req,res) => {
     const campground = await Campground.findById(req.params.id).populate('reviews').populate('author');//adding .populate gives the campground access to the reviews for that campground and the author so it is displayed on the show page for that campground--author is available to the campground under the key author.username
-    console.log(campground);
+    // console.log(campground);
         if(!campground) {
         req.flash('error', 'Cannot find that campground!');
         return res.redirect('/campgrounds');
@@ -55,37 +47,30 @@ router.get('/:id', catchAsync(async (req,res) => {
     res.render('campgrounds/show', { campground })
 }))
 
-router.get('/:id/edit', isLoggedIn, catchAsync(async (req, res) => {
+router.get('/:id/edit', isLoggedIn, isAuthor, catchAsync(async (req, res) => {//isAuthor validates if user can edit a campground
     const { id } = req.params;
     const campground = await Campground.findById(id)    
     if(!campground) {
         req.flash('error', 'Cannot find that campground!');
         return res.redirect('/campgrounds');
     }
-    if (!campground.author.equals(req.user._id)) {//if the campground author id on the campground is not equal to the currentUser id flash error message and redirect to campground
-        req.flash('error', 'You do not have permission to do that');
-        return res.redirect(`/campgrounds/${id}`);
-    }
+    
     res.render('campgrounds/edit', { campground })
 }))
 
-router.put('/:id', isLoggedIn, validateCampground, catchAsync(async (req, res) => {
+router.put('/:id', isLoggedIn, isAuthor, validateCampground, catchAsync(async (req, res) => {
     const { id } = req.params;
 
     //using the spread operator ...req.body.campground spreads that object into the object found from the id searched for in Campground.findByIdAndUpdate 
 
     //const campground = await Campground.findByIdAndUpdate(id,{...req.body.campground})--this line has to be broken up to protect the route--have to check and see if the user owns this camground before allowing them to update it
 
-    const campground = await Campground.findById(id);
-    if (!campground.author.equals(req.user._id)) {//if the campground author id on the campground is not equal to the currentUser id flass error message and redirect to campground
-        req.flash('error', 'You do not have permission to do that');
-        return res.redirect(`/campgrounds/${id}`);
-    }
+    const campground = await Campground.findByIdAndUpdate(id,{...req.body.campground})
     req.flash('success', 'Successfully updated campground!')
     res.redirect(`/campgrounds/${campground._id}`)
 }))
 
-router.delete('/:id', isLoggedIn, catchAsync(async (req ,res) => {
+router.delete('/:id', isLoggedIn, isAuthor, catchAsync(async (req ,res) => {
     const {id} = req.params;
     await Campground.findByIdAndDelete(id);//findByIdAndDelete() triggers only the delete middleware, findOneAndDelete added to in campgrounds.js--if another delete or remove method is used, it will not trigger
     req.flash('success', 'Successfully deleted campground!')
