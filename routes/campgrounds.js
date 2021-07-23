@@ -56,10 +56,15 @@ router.get('/:id', catchAsync(async (req,res) => {
 }))
 
 router.get('/:id/edit', isLoggedIn, catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id)
+    const { id } = req.params;
+    const campground = await Campground.findById(id)    
     if(!campground) {
         req.flash('error', 'Cannot find that campground!');
         return res.redirect('/campgrounds');
+    }
+    if (!campground.author.equals(req.user._id)) {//if the campground author id on the campground is not equal to the currentUser id flash error message and redirect to campground
+        req.flash('error', 'You do not have permission to do that');
+        return res.redirect(`/campgrounds/${id}`);
     }
     res.render('campgrounds/edit', { campground })
 }))
@@ -69,7 +74,13 @@ router.put('/:id', isLoggedIn, validateCampground, catchAsync(async (req, res) =
 
     //using the spread operator ...req.body.campground spreads that object into the object found from the id searched for in Campground.findByIdAndUpdate 
 
-    const campground = await Campground.findByIdAndUpdate(id,{...req.body.campground})
+    //const campground = await Campground.findByIdAndUpdate(id,{...req.body.campground})--this line has to be broken up to protect the route--have to check and see if the user owns this camground before allowing them to update it
+
+    const campground = await Campground.findById(id);
+    if (!campground.author.equals(req.user._id)) {//if the campground author id on the campground is not equal to the currentUser id flass error message and redirect to campground
+        req.flash('error', 'You do not have permission to do that');
+        return res.redirect(`/campgrounds/${id}`);
+    }
     req.flash('success', 'Successfully updated campground!')
     res.redirect(`/campgrounds/${campground._id}`)
 }))
