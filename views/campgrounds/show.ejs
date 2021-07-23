@@ -28,6 +28,7 @@
         </div>
     </div>
         <div class="col-6">
+            <% if(currentUser) { %> <%# if there is a currentUser, render the form--you have to be logged in to leave a review %> 
             <h2>Leave a Review</h2>
             <form action="/campgrounds/<%=campground._id%>/reviews" method="POST" class="mb-3 validated-form" novalidate><%#--novalidate tells form not to validate with html validations--validated-form is in the boilerplate.ejs and tells the form to use the javascript set up with the class of validated-form%>
                 <div class="mb-3">
@@ -43,6 +44,7 @@
                 </div>
                 <button class="btn btn-success">Submit</button>
             </form>
+            <% } %> 
             <% for(let review of campground.reviews) { %>
                 <div class="card mb-3">
                     <div class="card-body">

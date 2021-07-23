@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router({mergeParams: true});//express router likes to keep params seperate so mergeParams: true is required to access reviews for each campground since the reviews routes are in a different file in the routes folder
-const {validateReview} = require('../middleware')
+const {isLoggedIn, validateReview} = require('../middleware');
 const Campground = require('../models/campground');
 const Review = require ('../models/review');
 
@@ -12,9 +12,10 @@ const catchAsync = require('../utils/catchAsync');//need 2 dots since this file 
 
 
 
-router.post('/', validateReview, catchAsync(async (req, res) => {
+router.post('/', isLoggedIn, validateReview, catchAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id);
     const review = new Review(req.body.review);//in the form show page each input was givin a name where data was stored under review ie. name="review[rating]" so its all under the key of review once its been parsed
+    review.author = req.user._id;//so after we have checked if the user is logged in(isLoggedIn middleware), we can use that users ID to associate the user with the review
     campground.reviews.push(review);//in campground model the property on the CampgroundSchema was set to reviews plural which is an array of id's that correspond to a review and the review id is pushed there
     await review.save();
     await campground.save();
