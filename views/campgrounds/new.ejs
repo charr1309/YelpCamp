@@ -2,7 +2,7 @@
     <div class="row">
         <h1 class="text-center">New Campground</h1>
         <div class="col-6 offset-3">
-            <form action="/campgrounds" method = "POST" novalidate class="validated-form"><%#novalidate tells browers to ignore require attributes on inputs so bootstrap can take over%>
+            <form action="/campgrounds" method = "POST" novalidate class="validated-form" enctype="multipart/form-data"><%#novalidate tells browers to ignore require attributes on inputs so bootstrap can take over--the enctype attribute is first step to allowing image upload in the form%>
                 <div class="mb-3">
                     <label  for="title">Title</label>
                     <input class="form-control" type="text" id="title" name="campground[title]" required> <%# campground[title] is a way to group things together so everytime our data is sent via post request, to our express app to the server, everthing in the req.body will be stored under campground %>
@@ -17,13 +17,14 @@
                         Looks good!
                     </div>
                 </div>
-                <div class="mb-3">
+                <input type="file" name="image" id="">
+                <!-- <div class="mb-3">
                     <label class="form-label" for="image">Image Url</label>
                     <input class="form-control" type="text" id="image" name="campground[image]" required>
                     <div class="valid-feedback">
                         Looks good!
                     </div>
-                </div>
+                </div> -->
                 <div mb-3>
                     <label class="form-label" for="price">Price</label>
                     <div class="input-group">

@@ -5,6 +5,8 @@ const campgrounds = require('../controllers/campgrounds');
 const Campground = require('../models/campground');
 
 const { isLoggedIn, isAuthor, validateCampground, validateReview } = require('../middleware');
+const multer = require ('multer');
+const upload = multer({ dest: 'uploads/' });//initialize or execute multer by passing in a configuration object
 
 //moved campground routes to this campgrounds.js file in the routes folder so /campgrounds is removed now that they are connected in the index.js file via app.use('campgrounds', campgrounds)
 

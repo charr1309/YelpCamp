@@ -1,3 +1,9 @@
+//--the if statement below says if we are running in development(run in development is by default), require the dotenv package and take the variables in the .env file and add them to process.env in the node app so they can be accessed in this file or any other files--in production (not development), the variables are not added this way
+
+if(process.env.NODE_ENV !== "production") {//--process.env.NODE_ENV is an environment variable that is usually just development or production 
+    require('dotenv').config();//--require the dotenv module and call the config function
+}
+
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
