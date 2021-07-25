@@ -1,85 +1,32 @@
 const express = require('express');
 const router = express.Router();
 const catchAsync = require('../utils/catchAsync');//need 2 dots since this file is nested in the routes folder
-
+const campgrounds = require('../controllers/campgrounds');
 const Campground = require('../models/campground');
 
 const { isLoggedIn, isAuthor, validateCampground, validateReview } = require('../middleware');
 
-
-
-
 //moved campground routes to this campgrounds.js file in the routes folder so /campgrounds is removed now that they are connected in the index.js file via app.use('campgrounds', campgrounds)
-router.get('/', isLoggedIn, async (req, res) => {
-    const campgrounds = await Campground.find({});//finds all campgrounds
-    res.render('campgrounds/index.ejs', { campgrounds })//pass campgrounds to template
-})
+
+router.get('/', isLoggedIn, catchAsync(campgrounds.index));
 
 //this route below has to come before the :id route. If it doesnt the brower will match the :id route and since there is no new, id, you will get a time out error, so order does matter
 
-router.get('/new', isLoggedIn, (req,res) =>{//dont need async function here since its a form and wont be getting or posting until form is submitted    
-    res.render('campgrounds/new');
-})
+router.get('/new', isLoggedIn, campgrounds.renderNewForm)
 
 //req.body had to be parsed above. We add router.use(express.urlencode)...
 //code below sets up the endpoint from the form in campgrounds/new as a post request
 
 //adding isLoggedIn to this post route protects the route from a user using something like postman to access the route--the user would not see this route if they are not logged in to the site itself but the route is not protected from outside requests by other programs unless isLoggedIn is included on the route
 
-router.post('/', isLoggedIn, validateCampground, catchAsync(async(req,res,next) => {
-    //if(!req.body.campground) throw new ExpressError('Invalid campground data', 400);-- this line just checks to see if the req.body has campground--adding Joi for validation will allow much more detail validation for all values--campground is the key and all the values are under campground (ex. campground[price] or campground[description] etc.)--moved the joi schema from below to a function about so it can just be called on the other routes
-        
-    const campground = new Campground(req.body.campground);
-    campground.author = req.user._id;//associate the author with newly created campgrounds--req.user is automatically added in
-    await campground.save();
-    req.flash('success', 'Successfully made a new campground!');//installing connect-flash allows flash messages to be displayed to the user--want to use after the save in case there are any errors thrown--after the message you want to redirect--after the redirect you want to display that message in the template you redirect to--it could be added to the show routes individually but instead its added to the middleware that will take everything on every request and show the message--middleware will be defined in index.js to make this possible
-    res.redirect(`/campgrounds/${campground._id}`)
-}))
+router.post('/', isLoggedIn, validateCampground, catchAsync(campgrounds.createCampground))
 
-router.get('/:id', catchAsync(async (req,res) => {
-    const campground = await Campground.findById(req.params.id).populate({
-        path:'reviews',
-        populate: {//set an object on this nested populate--populate all the reviews on the show page for the campground we are finding, populate the reviews, then populate their author, and then seperately below in the second populate, populate the author of this campground 
-            path: 'author'
-        }
-    }).populate('author');//adding .populate gives the campground access to the reviews for that campground and the author so it is displayed on the show page for that campground--author is available to the campground under the key author.username--reviews and author are 2 fields that are on campground--to put the name of the reviewer on each review, we want to populate the reviews author
-     console.log(campground);
-        if(!campground) {
-        req.flash('error', 'Cannot find that campground!');
-        return res.redirect('/campgrounds');
-    }
-    // console.log(campground);
-    res.render('campgrounds/show', { campground })
-}))
+router.get('/:id', catchAsync(campgrounds.showCampground))
 
-router.get('/:id/edit', isLoggedIn, isAuthor, catchAsync(async (req, res) => {//isAuthor validates if user can edit a campground
-    const { id } = req.params;
-    const campground = await Campground.findById(id)    
-    if(!campground) {
-        req.flash('error', 'Cannot find that campground!');
-        return res.redirect('/campgrounds');
-    }
-    
-    res.render('campgrounds/edit', { campground })
-}))
+router.get('/:id/edit', isLoggedIn, isAuthor, catchAsync(campgrounds.renderEditForm))
 
-router.put('/:id', isLoggedIn, isAuthor, validateCampground, catchAsync(async (req, res) => {
-    const { id } = req.params;
+router.put('/:id', isLoggedIn, isAuthor, validateCampground, catchAsync(campgrounds.updateCampground))
 
-    //using the spread operator ...req.body.campground spreads that object into the object found from the id searched for in Campground.findByIdAndUpdate 
-
-    //const campground = await Campground.findByIdAndUpdate(id,{...req.body.campground})--this line has to be broken up to protect the route--have to check and see if the user owns this camground before allowing them to update it
-
-    const campground = await Campground.findByIdAndUpdate(id,{...req.body.campground})
-    req.flash('success', 'Successfully updated campground!')
-    res.redirect(`/campgrounds/${campground._id}`)
-}))
-
-router.delete('/:id', isLoggedIn, isAuthor, catchAsync(async (req ,res) => {
-    const {id} = req.params;
-    await Campground.findByIdAndDelete(id);//findByIdAndDelete() triggers only the delete middleware, findOneAndDelete added to in campgrounds.js--if another delete or remove method is used, it will not trigger
-    req.flash('success', 'Successfully deleted campground!')
-    res.redirect('/campgrounds');
-}))
+router.delete('/:id', isLoggedIn, isAuthor, catchAsync(campgrounds.deleteCampground))
 
 module.exports = router;
