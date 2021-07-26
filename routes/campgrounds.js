@@ -16,11 +16,18 @@ const upload = multer({ storage });//refactor multer to use storage instead of d
 
 router.route('/')
     .get(catchAsync(campgrounds.index))
-    //.post(isLoggedIn, validateCampground, catchAsync(campgrounds.createCampground))
-    .post(upload.array('image'), (req, res) =>{//this is uploading from multer with upload.single or upload.array for example, and told multer to store things in a different destination above,--lecture 527  
-        console.log(req.body, req.files);//use req.file for single upload and upload.array uses req.files
-        res.send('IT WORKED?!')
-    })
+    // the error below occured because upload.array('image') came after validate campground
+    //.post(isLoggedIn, validateCampground, upload.array('image'), catchAsync(campgrounds.createCampground))--multer is responsible for running req.body, validate campground depends on req.body see lecture 531 
+    // "campground" is required
+    //  Error: "campground" is required at module.exports.validateCampground (C:\Users\ceh71\repos\YelpCamp\middleware.js:20:15) at Layer.handle [as handle_request]
+
+    .post(isLoggedIn, upload.array('image'), validateCampground, catchAsync(campgrounds.createCampground))//in the form data the field created was image, so that is the name used in upload.array
+
+
+    //.post(upload.array('image'), (req, res) =>{//this is uploading from multer with upload.single or upload.array for example, and told multer to store things in a different destination above,--lecture 527  
+        //console.log(req.body, req.files);//use req.file for single upload and upload.array uses req.files
+        //res.send('IT WORKED?!')
+    //})
 
     //this route below has to come before the :id route. If it doesnt the brower will match the :id route and since there is no new, id, you will get a time out error, so order does matter
 

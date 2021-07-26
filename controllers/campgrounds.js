@@ -11,10 +11,15 @@ module.exports.renderNewForm = (req,res) =>{//dont need async function here sinc
 
 module.exports.createCampground = async(req,res,next) => {
     //if(!req.body.campground) throw new ExpressError('Invalid campground data', 400);-- this line just checks to see if the req.body has campground--adding Joi for validation will allow much more detail validation for all values--campground is the key and all the values are under campground (ex. campground[price] or campground[description] etc.)--moved the joi schema from below to a function about so it can just be called on the other routes
-        
+
     const campground = new Campground(req.body.campground);
+    
+    campground.images = req.files.map(f => ({ url: f.path, filename: f.filename })); //when the image is uploaded, the image info in multer includes the path and the filename when it is uploaded in the route in campgrounds.js  in the routes folder--this line maps over the image/images and creates an array and the path is stored in the database--we are mapping over the array that has been add to req.files(includes all the info path, filename etc) thanks to multer--this code adds the value of images to campground
+     
+     
     campground.author = req.user._id;//associate the author with newly created campgrounds--req.user is automatically added in
     await campground.save();
+    console.log(campground);
     req.flash('success', 'Successfully made a new campground!');//installing connect-flash allows flash messages to be displayed to the user--want to use after the save in case there are any errors thrown--after the message you want to redirect--after the redirect you want to display that message in the template you redirect to--it could be added to the show routes individually but instead its added to the middleware that will take everything on every request and show the message--middleware will be defined in index.js to make this possible
     res.redirect(`/campgrounds/${campground._id}`)
 }
