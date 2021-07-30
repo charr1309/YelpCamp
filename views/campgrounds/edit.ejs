@@ -17,9 +17,13 @@
                         Looks good!
                     </div>
                 </div>
-                <div class="mb-3">
+                <div class="form-file custom-file" class="mb-3">
+                    <label for="formFile custom-file-label" class="form-label">Upload Image(s)</label>
+                    <input class="form-control" type="file" id="formFile" multiple>
+                  </div>
+                <!--<div class="mb-3">
                     <label class="form-label" for="image">Add Images</label>
-                    <input type="file" name="image" id="image" multiple><!--image needs to match since multer is looking for image lecture 534--set multiple to true so more than one image can be uploaded-->
+                    <input type="file" name="image" id="image" multiple>image needs to match since multer is looking for image lecture 534--set multiple to true so more than one image can be uploaded-->
 
                     <!--code below removed in lecture 534 to add image upload to edit page-->
                     <!-- <input class="form-control" type="text" id="image" name="campground[image]" value="<%=campground.image%>" required>
