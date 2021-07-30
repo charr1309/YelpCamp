@@ -21,6 +21,15 @@
                     <label for="formFile custom-file-label" class="form-label">Upload Image(s)</label>
                     <input class="form-control" type="file" id="formFile" multiple>
                   </div>
+                  <div class="mb-3">
+                      <% campground.images.forEach(function(img, i) { %>
+                        <img src="<%=img.url %>" class="img-thumbnail" alt="">
+                        <div class="form-check-inline">
+                            <input type="checkbox" id="image-<%=i%>" name="deleteImages[]" value="<%=img.filename%>"><%# lecture 537 added delete images--set each checkbox to have a different value and set them all to have a name of deleteImages[]--any box that is checked, its value is set to deleteImages and it is an array when the body is parsed  %> 
+                        </div> 
+                        <label for="image-<%=i%>">Delete?</label> 
+                      <% }) %> 
+                  </div>
                 <!--<div class="mb-3">
                     <label class="form-label" for="image">Add Images</label>
                     <input type="file" name="image" id="image" multiple>image needs to match since multer is looking for image lecture 534--set multiple to true so more than one image can be uploaded-->

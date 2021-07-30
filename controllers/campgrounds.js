@@ -1,4 +1,5 @@
 const Campground = require("../models/campground");
+const { cloudinary } = require("../cloudinary");//incude cloudinary so images can be deleted there also--lecture 538
 
 module.exports.index = async (req, res) => {
   const campgrounds = await Campground.find({}); //finds all campgrounds
@@ -69,6 +70,14 @@ module.exports.updateCampground = async (req, res) => {
   })); //when the image is uploaded, the image info in multer includes the path and the filename that was saved in the schema when it is uploaded in the route in campgrounds.js  in the routes folder--this line maps over the image/images and creates an array and the path is stored in the database--we are mapping over the array that has been add to the req object so req.files(includes all the info path, filename etc) thanks to multer--this code adds the value of images to campground
   campground.images.push(...imgs);
   await campground.save();
+
+  //below use lowercase campground, the one that was found above and the $pull operator(how you pull an item from an array)--pull out of the images array where the filename on each image is not equal to something but is $in req.body.deleteImages--only want to do this if there are images in the req.body.deleteImages array--lecture 538 
+  if (req.body.deleteImages) {
+    for (let filename of req.body.deleteImages) {//delete selected images from cloudinary also
+      await cloudinary.uploader.destroy(filename);
+    }
+  await campground.updateOne({$pull: {images: {filename: { $in: req.body.deleteImages}}}})//only deletes filename from database
+  }
   //using the spread operator ...req.body.campground spreads that object into the object found from the id searched for in Campground.findByIdAndUpdate
 
   //const campground = await Campground.findByIdAndUpdate(id,{...req.body.campground})--this line has to be broken up to protect the route--have to check and see if the user owns this camground before allowing them to update it
