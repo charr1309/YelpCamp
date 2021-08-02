@@ -2,7 +2,7 @@
     <div class="row">
         <h1 class="text-center">Edit Campground</h1>
         <div class="col-6 offset-3">
-            <form action="/campgrounds/<%=campground._id%>?_method=PUT" method = "POST" novalidate class="validated-form"><%# using _method from method override%>
+            <form action="/campgrounds/<%=campground._id%>?_method=PUT" method = "POST" novalidate class="validated-form" enctype="multipart/form-data"><%# using _method from method override--enctype="multipart/form-data added to allow multiple images to be uploaded--lecture 534%>
                 <div class="mb-3">
                     <label  for="title">Title</label>
                     <input class="form-control" type="text" id="title" name="campground[title]" value="<%=campground.title%>" required> <%# campground[title] is a way to group things together so everytime our data is sent via post request, to our express app to the server, everthing in the req.body will be stored under campground %>
@@ -17,12 +17,20 @@
                         Looks good!
                     </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label" for="image">Image Url</label>
-                    <input class="form-control" type="text" id="image" name="campground[image]" value="<%=campground.image%>" required>
+                <div class="form-file custom-file" class="mb-3">
+                    <label for="formFile custom-file-label" class="form-label">Upload Image(s)</label>
+                    <input class="form-control" type="file" id="formFile" multiple>
+                  </div>
+                <!--<div class="mb-3">
+                    <label class="form-label" for="image">Add Images</label>
+                    <input type="file" name="image" id="image" multiple>image needs to match since multer is looking for image lecture 534--set multiple to true so more than one image can be uploaded-->
+
+                    <!--code below removed in lecture 534 to add image upload to edit page-->
+                    <!-- <input class="form-control" type="text" id="image" name="campground[image]" value="<%=campground.image%>" required>
                     <div class="valid-feedback">
-                        Looks good!
-                    </div>
+                        Looks good! 
+                    </div>-->
+
                 </div>
                 <div mb-3>
                     <label class="form-label" for="price">Price</label>
