@@ -1,189 +1,107 @@
-<% layout('layouts/boilerplate')%>
-<link rel="stylesheet" href="/stylesheets/stars.css" />
-<div class="row">
-  <div
-    id="campgroundCarousel"
-    class="carousel slide"
-    data-bs-ride="carousel"
-  >
-    <div class="carousel-inner">
-
-      <%# loop over images below--need forEach instead of for loop to select the
-      first image and add active class so both images are not classified as
-      active--lecture 532 %> 
-      
-      <% campground.images.forEach((img, i) => {%>
-      <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
-        <img src="<%= img.url %>" class="d-block w-100" alt="" />
-      </div>
-      <% }) %>
+    <% layout('layouts/boilerplate')%>
+    <link rel="stylesheet" href="/stylesheets/stars.css">
+    <div class="row">
+        <div class="col-6">
+            <div id="campgroundCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <% campground.images.forEach((img, i) => {  %> <%#--need forEach instead of for loop to get the index of each image so only the image at index 0 is active so image[0] is the only one showing when the page is first displyed%>
+                  <div class="carousel-item <%= i === 0 ? 'active' : ''%>">
+                    <img src="<%= img.url %>" class="d-block w-100" alt="">
+                  </div>
+                  <% }) %> 
+                </div>
+                <% if(campground.images.length > 1) { %> <%#--only show controls if there is more than one image%>
+                <button class="carousel-control-prev" type="button" data-bs-target="#campgroundCarousel" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#campgroundCarousel" data-bs-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Next</span>
+                </button>
+              </div>
+              <% } %> 
+            <div class="card mb-3">
+                 
+                <div class="card-body">
+                  <h5 class="card-title"><%= campground.title %></h5>
+                  <p class="card-text"><%= campground.description %></p>
+                </div>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item text-muted"><%= campground.location %></li>
+                  <li class="list-group-item ">Submitted by <%= campground.author.username %></li><%#added author to campground using key author.username added with populate function added in route/campgrounds.js-- lecture 515%>
+                  <li class="list-group-item">$<%= campground.price %>/night</li>
+                </ul>
+                <%#--lecture 516--to show or hide edit and delete buttons so only the user who owns the campground can edit or delete it, you have to monitor the campground.author which is an ID and the currentUser._id which will have an ID if the user is signed in--we want to see if these two ID's match you must check first if there is a currentUser before checking for equality because if there is no currentUser it will break the code%>
+                <% if(currentUser && campground.author.equals(currentUser._id)) { %>  
+                <div class="card-body">
+                    <a class="card-link btn btn-info" href="/campgrounds/<%=campground._id%>/edit">Edit</a>
+                    <form class="d-inline" action="/campgrounds/<%=campground._id%>?_method=DELETE" method="POST">
+                    <button class="btn btn-danger" >Delete</button>
+                    <% } %> 
+                </form>
+            </div>
+            <div class="card-footer text-muted">
+                2 days ago
+            </div>
+            
+        </div>
     </div>
-    <% if(campground.images.length > 1) { %><%# only show the control buttons if the number of images is greater than 1 %> 
-    <button
-      class="carousel-control-prev"
-      type="button"
-      data-bs-target="#campgroundCarousel"
-      data-bs-slide="prev"
-    >
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button
-      class="carousel-control-next"
-      type="button"
-      data-bs-target="#campgroundCarousel"
-      data-bs-slide="next"
-    >
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Next</span>
-    </button>
-  </div>
-  <% } %>
-  <div class="col-6">
-    <div class="card mb-3">
-      <div class="card-body">
-        <h5 class="card-title"><%= campground.title %></h5>
-        <p class="card-text"><%= campground.description %></p>
-      </div>
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item text-muted"><%= campground.location %></li>
-        <li class="list-group-item">
-          Submitted by <%= campground.author.username %>
-        </li>
-        <%#added author to campground using key author.username added with
-        populate function added in route/campgrounds.js-- lecture 515%>
-        <li class="list-group-item">$<%= campground.price %>/night</li>
-      </ul>
-      <%#--lecture 516--to show or hide edit and delete buttons so only the user
-      who owns the campground can edit or delete it, you have to monitor the
-      campground.author which is an ID and the currentUser._id which will have
-      an ID if the user is signed in--we want to see if these two ID's match you
-      must check first if there is a currentUser before checking for equality
-      because if there is no currentUser it will break the code%> <%
-      if(currentUser && campground.author.equals(currentUser._id)) { %>
-      <div class="card-body">
-        <a
-          class="card-link btn btn-info"
-          href="/campgrounds/<%=campground._id%>/edit"
-          >Edit</a
-        >
-        <form
-          class="d-inline"
-          action="/campgrounds/<%=campground._id%>?_method=DELETE"
-          method="POST"
-        >
-          <button class="btn btn-danger">Delete</button>
-          <% } %>
-        </form>
-      </div>
-      <div class="card-footer text-muted">2 days ago</div>
-    </div>
-  </div>
-  <div class="col-6">
-    <% if(currentUser) { %> <%# if there is a currentUser, render the form--you
-    have to be logged in to leave a review %>
-    <h2>Leave a Review</h2>
-    <form
-      action="/campgrounds/<%=campground._id%>/reviews"
-      method="POST"
-      class="mb-3 validated-form"
-      novalidate
-    >
-      <%#--novalidate tells form not to validate with html
-      validations--validated-form is in the boilerplate.ejs and tells the form
-      to use the javascript set up with the class of validated-form%>
-      <!-- <div class="mb-3">
+        <div class="col-6">
+            <% if(currentUser) { %> <%# if there is a currentUser, render the form--you have to be logged in to leave a review %> 
+            <h2>Leave a Review</h2>
+            <form action="/campgrounds/<%=campground._id%>/reviews" method="POST" class="mb-3 validated-form" novalidate><%#--novalidate tells form not to validate with html validations--validated-form is in the boilerplate.ejs and tells the form to use the javascript set up with the class of validated-form%>
+                <!-- <div class="mb-3">
                     <label for="rating">Rating</label>
                     <input class="form-range" type="range" min="1" max="5" name="review[rating]" id="rating"><%#used square brackets to put all inputs under the key review%>
                 </div> -->
 
-      <!-- code below has name of rating--must change to review[rating] or error message of rating is not allowed will result -->
-      <div class="mb-3">
-        <fieldset class="starability-basic">
-          <input
-            type="radio"
-            id="no-rate"
-            class="input-no-rate"
-            name="review[rating]"
-            value="1"
-            checked
-            aria-label="No rating."
-          />
-          <input
-            type="radio"
-            id="first-rate1"
-            name="review[rating]"
-            value="1"
-          />
-          <label for="first-rate1" title="Terrible">1 star</label>
-          <input
-            type="radio"
-            id="first-rate2"
-            name="review[rating]"
-            value="2"
-          />
-          <label for="first-rate2" title="Not good">2 stars</label>
-          <input
-            type="radio"
-            id="first-rate3"
-            name="review[rating]"
-            value="3"
-          />
-          <label for="first-rate3" title="Average">3 stars</label>
-          <input
-            type="radio"
-            id="first-rate4"
-            name="review[rating]"
-            value="4"
-          />
-          <label for="first-rate4" title="Very good">4 stars</label>
-          <input
-            type="radio"
-            id="first-rate5"
-            name="review[rating]"
-            value="5"
-          />
-          <label for="first-rate5" title="Amazing">5 stars</label>
-        </fieldset>
-      </div>
-      <div class="mb-3">
-        <label class="form-label" for="body">Review Text</label>
-        <textarea
-          class="form-control"
-          name="review[body]"
-          id="review"
-          cols="30"
-          rows="3"
-          required
-        ></textarea>
-        <div class="valid-feedback">Looks good!</div>
-      </div>
-      <button class="btn btn-success">Submit</button>
-    </form>
-    <% } %> <% for(let review of campground.reviews) { %>
-    <div class="card mb-3">
-      <div class="card-body">
-        <h5 class="card-title"><%= review.author.username %></h5>
-
-        <p class="starability-result" data-rating="<%= review.rating %>">
-          Rated: <%= review.rating %> stars
-        </p>
-        <%# = sign after the angle bracket and percent will output the value of
-        the expression and without is for write javascript logic--lecture
-        520--add review author to review %>
-        <p class="card-text">Review: <%= review.body %></p>
-        <% if(currentUser && review.author.equals(currentUser._id)) { %><%#only
-        show the delete button to the user who created the review%>
-        <form
-          action="/campgrounds/<%=campground._id%>/reviews/<%=review._id%>?_method=DELETE"
-          method="POST"
-        >
-          <button class="btn btn-sm btn-danger">Delete</button>
-        </form>
-        <%#this form is in the for loop so the button will be on each review%>
-        <% } %>
-      </div>
-    </div>
-    <% } %>
-  </div>
-</div>
+                <!-- code below has name of rating--must change to review[rating] or error message of rating is not allowed will result -->
+                <div class="mb-3">
+                <fieldset class="starability-basic">                    
+                    <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
+                    <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                    <label for="first-rate1" title="Terrible">1 star</label>
+                    <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                    <label for="first-rate2" title="Not good">2 stars</label>
+                    <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                    <label for="first-rate3" title="Average">3 stars</label>
+                    <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                    <label for="first-rate4" title="Very good">4 stars</label>
+                    <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                    <label for="first-rate5" title="Amazing">5 stars</label>
+                  </fieldset>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="body">Review Text</label>
+                    <textarea class="form-control" name="review[body]" id="review" cols="30" rows="3" required></textarea>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                </div>
+                <button class="btn btn-success">Submit</button>
+            </form>
+            <% } %> 
+            <% for(let review of campground.reviews) { %>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title"> <%= review.author.username %></h5>
+                        
+                        <p class="starability-result" data-rating="<%= review.rating %>">
+                        Rated: <%= review.rating %> stars
+                        </p>
+                        <%# = sign after the angle bracket and percent will output the value of the expression and without is for write javascript logic--lecture 520--add review author to review %> 
+                        <p class="card-text">Review: <%= review.body %></p>
+                        <% if(currentUser && review.author.equals(currentUser._id)) { %><%#only show the delete button to the user who created the review%>
+                        <form action="/campgrounds/<%=campground._id%>/reviews/<%=review._id%>?_method=DELETE" method="POST">
+                            <button class="btn btn-sm btn-danger">Delete</button>
+                        </form><%#this form is in the for loop so the button will be on each review%>
+                        <% } %> 
+                    </div>
+                </div>                
+            <% } %>
+        </div>
+        
+    
+    
+    
