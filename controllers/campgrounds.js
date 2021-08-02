@@ -1,4 +1,5 @@
 const Campground = require('../models/campground');
+const { cloudinary } = require('../cloudinary');
 
 module.exports.index = async (req, res) => {
     const campgrounds = await Campground.find({});//finds all campgrounds
@@ -53,12 +54,23 @@ module.exports.renderEditForm = async (req, res) => {//isAuthor validates if use
 
 module.exports.updateCampground = async (req, res) => {
     const { id } = req.params;
+    console.log(req.body);
 
     //using the spread operator ...req.body.campground spreads that object into the object found from the id searched for in Campground.findByIdAndUpdate 
 
     //const campground = await Campground.findByIdAndUpdate(id,{...req.body.campground})--this line has to be broken up to protect the route--have to check and see if the user owns this camground before allowing them to update it
 
     const campground = await Campground.findByIdAndUpdate(id,{...req.body.campground})
+    const imgs = req.files.map(f => ({url: f.path, filename: f.filename}));//--since req.files.map creates an array, the array created in the update needs to be spreaded into the existing array so the existing images arent replaced with the updated images
+    campground.images.push(...imgs);
+    await campground.save();
+    if (req.body.deleteImages) {
+      for(let filename of req.body.deleteImages) {
+        await cloudinary.uploader.destroy(filename);
+      }
+      await campground.updateOne({$pull: {images: {filename: { $in: req.body.deleteImages }}}})//pull from the images array all images where the filename is in the req.body.deleteImages array
+      console.log(campground);
+    }
     req.flash('success', 'Successfully updated campground!')
     res.redirect(`/campgrounds/${campground._id}`)
 }

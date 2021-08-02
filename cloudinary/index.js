@@ -4,7 +4,7 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 //Begin by setting config on cloudinary--using the variables declared in the env file, assign their values in the config--the variable names in the env file are up to you, in the config, however, cloud_name, api_key, and api_secret are mandatory, they must be those variable names--the config is basically associating the accounts with this cloudinary instance
 
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARRY_CLOUD_NAME,
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_KEY,
     api_secret: process.env.CLOUDINARY_SECRET
 });

@@ -28,9 +28,19 @@ const seedDB = async () => {
             author: '60f8058dc1dd64658e90ebae',//--lecture 515--pulled an id from the database and set all campgrounds to have an author with that id--step 2 after adding an author property to the campground schema in models/campground.js--now run node seeds/index.js to re-seed the database and all the campgrounds will have an author with the ID of the ID pulled from the database--right now all campgrounds belong to the same author
            location: `${cities[random1000].city}, ${cities[random1000].state}`,
            title: `${sample(descriptors)} ${sample(places)}`, 
-           image: 'https://source.unsplash.com/collection/483251',
+        //    image: 'https://source.unsplash.com/collection/483251',
            description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere inventore est dolore corrupti accusantium odio voluptates excepturi enim perferendis! Aliquid magni magnam fuga, asperiores quasi voluptatibus sequi optio ea maxime?',
-           price 
+           price,
+           images: [
+            {              
+              url: 'https://res.cloudinary.com/dnqgv4qi0/image/upload/v1627870079/YelpCamp/fvcrqxmlw7ulfghyarzh.jpg',
+              filename: 'YelpCamp/fvcrqxmlw7ulfghyarzh'
+            },
+            {              
+              url: 'https://res.cloudinary.com/dnqgv4qi0/image/upload/v1627870080/YelpCamp/cojgmxzx1mhbtplxoell.jpg',
+              filename: 'YelpCamp/cojgmxzx1mhbtplxoell'
+            }
+          ]
         })
         await camp.save();
     }
