@@ -2,14 +2,22 @@ const mongoose = require('mongoose');
 const review = require('./review');
 const Schema = mongoose.Schema;
 
+//you can only add a virtual property to a schema--lecture 539
+
+const ImageSchema = new Schema({//moved properties of images in the CampgroundSchema to new ImageSchema to add virtual property to images only
+    
+    url: String,
+    filename: String
+    
+});
+
+ImageSchema.virtual('thumbnail').get(function() {
+    return this.url.replace('/upload', '/upload/w_200')//replace part of url that has /upload to /upload/w_200 so all images will have that width
+})
+
 const CampgroundSchema = new Schema({
     title: String,
-    images: [
-        {
-            url: String,
-            filename: String
-        }
-    ],
+    images: [ImageSchema],
     price: Number,
     description: String,
     location: String,

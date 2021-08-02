@@ -8,11 +8,7 @@ module.exports.campgroundSchema = Joi.object({
         location: Joi.string().required(),
         description: Joi.string().required()
     }).required(),
-<<<<<<< HEAD
-    deleteImages: Joi.array()//lecture537--added to allow deletion of images from campgrounds
-=======
     deleteImages: Joi.array()
->>>>>>> revert
 })
 
 module.exports.reviewSchema = Joi.object({
