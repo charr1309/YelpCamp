@@ -15,9 +15,23 @@ ImageSchema.virtual('thumbnail').get(function() {
     return this.url.replace('/upload', '/upload/w_200')//replace part of url that has /upload to /upload/w_200 so all images will have that width
 })
 
+//Lecture 542
+//geo JSON has a particular format where there is always a type field--in this case it will always be point and that is coming from mapbox--geo JSON is bigger than just mapbox like JSON is bigger than just one API, its a standard which is quite common--Mongo accepts alot of geoJSON functionalites see: docs.mongodb.com/manual/crud/--the geoJSON pattern must be followed to allow other functionalites to be added later  ie. location: {type: 'Point', coordinates: [-73.9375, 40.8303] }--the coordinates are presented as longitude then latitude so the numbers may need to be reversed depending on the map service specs on order
+
 const CampgroundSchema = new Schema({
     title: String,
     images: [ImageSchema],
+    geometry: {
+        type: {
+            type: String,
+            enum: ['Point'],//enum is where you provide specific options--in this case enum has to be the string point--is the only option
+            required: true 
+        },
+        coordinates: {//is an array of 2 numbers and it has to be required
+            type: [Number],
+            required: true
+        }
+    },
     price: Number,
     description: String,
     location: String,
