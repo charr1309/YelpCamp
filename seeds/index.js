@@ -33,7 +33,10 @@ const seedDB = async () => {
            price,
            geometry: { //set geometry to always be these coordinates so that if none are entered it will not break the code
              type: 'Point', 
-             coordinates: [ -122.3301, 47.6038 ]
+             coordinates: [//change hard coded coordinates to the random values for cities from above--lecture 549--reseed database to include coordinate data 
+              cities[random1000].longitude,
+              cities[random1000].latitude,
+            ]
            },
            images: [
             {              
