@@ -31,6 +31,7 @@
 
     <script>
         const mapToken = '<%-process.env.MAPBOX_TOKEN%>';
+        const campgrounds = {features: <%-JSON.stringify(campgrounds)%>} <%#changed to campgrounds since this is for all campgrounds--lecture 550%--data is listed under the key of features with all the earthquake data inside so pattern to add campgrounds has to be an object with the key of features%>
     </script> 
 
     <script src="/javascripts/clusterMap.js"></script>
