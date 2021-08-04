@@ -3,9 +3,9 @@
 
     <%# the script tag below will run first and will provide the access token and store in mapToken and the token can be accessed in the script by accessing that variable in the script containing the code coming from showPageMap.js %> 
     <script>
-        const mapToken = "<%-process.env.MAPBOX_TOKEN%>";
-    </script>
-
+        const mapToken = '<%-process.env.MAPBOX_TOKEN%>';
+        const campground = <%-JSON.stringify(campground)%>; 
+    </script>    
     <div class="row">
         <div class="col-6">
             <div id='map' style='width: 400px; height: 300px;'></div><%# puts the map on the page--shows as just an empty div with width and height %> 
