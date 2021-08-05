@@ -18,6 +18,10 @@ ImageSchema.virtual('thumbnail').get(function() {
 //Lecture 542
 //geo JSON has a particular format where there is always a type field--in this case it will always be point and that is coming from mapbox--geo JSON is bigger than just mapbox like JSON is bigger than just one API, its a standard which is quite common--Mongo accepts alot of geoJSON functionalites see: docs.mongodb.com/manual/crud/--the geoJSON pattern must be followed to allow other functionalites to be added later  ie. location: {type: 'Point', coordinates: [-73.9375, 40.8303] }--the coordinates are presented as longitude then latitude so the numbers may need to be reversed depending on the map service specs on order
 
+//By default, Mongoose does not include virtuals when you convert a document to JSON. To include virtuals you need to set the toJSON schema option to {virtuals: true}--lecture 553--then include opts in the schema object after initializing the schema pattern
+
+const opts = { toJSON: {virtuals: true} };
+
 const CampgroundSchema = new Schema({
     title: String,
     images: [ImageSchema],
@@ -45,6 +49,16 @@ const CampgroundSchema = new Schema({
             ref: 'Review'
         }
     ]
+},  opts);//include opts in the schema
+
+
+
+
+
+CampgroundSchema.virtual('properties.popUpMarkup').get(function() {
+    return `
+    <strong><a href="/campgrounds/${this._id}">${this.title}</a></strong>
+    <p>${this.description.substring(0, 20)}...</p>`
 });
 
 //test code below to see if DELETED is printed out when a campground is deleted--first step to delete reviews when a campground is deleted
