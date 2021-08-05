@@ -11,6 +11,8 @@ const map = new mapboxgl.Map({
      zoom: 9 // starting zoom
 });
 
+map.addControl(new mapboxgl.NavigationControl());
+
 //add a pin to the map that marks the location of the longitude and latitude
 
 new mapboxgl.Marker()

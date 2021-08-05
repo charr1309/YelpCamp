@@ -8,7 +8,7 @@
     </script>    
     <div class="row">
         <div class="col-6">
-            <div id='map' style='width: 400px; height: 300px;'></div><%# puts the map on the page--shows as just an empty div with width and height %> 
+             
             <div id="campgroundCarousel" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-inner">
                     <% campground.images.forEach((img, i) => {  %> <%#--need forEach instead of for loop to get the index of each image so only the image at index 0 is active so image[0] is the only one showing when the page is first displyed%>
@@ -54,7 +54,11 @@
             
         </div>
     </div>
-        <div class="col-6">
+
+    <div class="col-6">
+        <div id='map'></div><%# puts the map on the page--shows as just an empty div with width and height %>
+
+        
             <% if(currentUser) { %> <%# if there is a currentUser, render the form--you have to be logged in to leave a review %> 
             <h2>Leave a Review</h2>
             <form action="/campgrounds/<%=campground._id%>/reviews" method="POST" class="mb-3 validated-form" novalidate><%#--novalidate tells form not to validate with html validations--validated-form is in the boilerplate.ejs and tells the form to use the javascript set up with the class of validated-form%>
