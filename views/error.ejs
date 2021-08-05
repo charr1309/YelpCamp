@@ -3,7 +3,9 @@
     <div class="col-6 offset-3">
         <div class="alert alert-danger" role="alert">
             <h4 class="alert-heading"><%=err.message %></h4><%#--err.message is passed here from the error statement on the routes error handler--%>
+            <% if (process.env.NODE_ENV !== "production") {} %><%# only show error stack not in production mode--lecture 565 %>  
             <p><%=err.stack%></p><%#for development purposes I will include the error stack trace--for production I will change this to something for the user%>
+            <% } %> 
           </div>
     </div>
 </div>
