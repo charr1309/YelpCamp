@@ -5,10 +5,10 @@ const {places, descriptors} = require('./seedHelpers');
 
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false
+    // useNewUrlParser: true,
+    // useCreateIndex: true,
+    // useUnifiedTopology: true,
+    // useFindAndModify: false
 });
 
 const db = mongoose.connection;
@@ -20,7 +20,7 @@ db.once("open", () => {
 const sample = array => array[Math.floor(Math.random() * array.length)];//get random index of array
 
 const seedDB = async () => {
-    await Campground.deleteMany({});    
+    await Campground.deleteMany({});//delete everyting currently in the database    
     for(let i = 0; i < 300; i++) {
         const random1000 = Math.floor(Math.random() * 1000);
         const price = Math.floor(Math.random() * 20) + 10;
@@ -28,7 +28,7 @@ const seedDB = async () => {
             author: '60f8058dc1dd64658e90ebae',//--lecture 515--pulled an id from the database and set all campgrounds to have an author with that id--step 2 after adding an author property to the campground schema in models/campground.js--now run node seeds/index.js to re-seed the database and all the campgrounds will have an author with the ID of the ID pulled from the database--right now all campgrounds belong to the same author
            location: `${cities[random1000].city}, ${cities[random1000].state}`,
            title: `${sample(descriptors)} ${sample(places)}`, 
-        //    image: 'https://source.unsplash.com/collection/483251',
+           image: 'https://source.unsplash.com/collection/483251',
            description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere inventore est dolore corrupti accusantium odio voluptates excepturi enim perferendis! Aliquid magni magnam fuga, asperiores quasi voluptatibus sequi optio ea maxime?',
            price,
            geometry: { //set geometry to always be these coordinates so that if none are entered it will not break the code
@@ -53,6 +53,6 @@ const seedDB = async () => {
     }
 }
 
-seedDB().then(() => {
+seedDB().then(() => {//seedDB returns a promise since it is an async function--this closes the database since once seeds is run it doesnt need to be left open
     mongoose.connection.close();
 });

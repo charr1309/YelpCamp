@@ -25,6 +25,7 @@ const opts = { toJSON: {virtuals: true} };
 const CampgroundSchema = new Schema({
     title: String,
     images: [ImageSchema],
+    //image: String,
     geometry: {
         type: {
             type: String,
