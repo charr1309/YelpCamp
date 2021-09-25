@@ -1,7 +1,7 @@
 if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();
 }
-
+//mongodb+srv://first-user:<password>@cluster0.pnwr4.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
 
 const express = require('express');
 const path = require('path');
@@ -23,10 +23,13 @@ const mongoSanitize = require('express-mongo-sanitize');
 const userRoutes = require('./routes/users');
 const campgroundRoutes = require('./routes/campgrounds');
 const reviewRoutes = require('./routes/reviews');
+
+
+const MongoDBStore = require('connect-mongo')(session);//lecture 569
 // const dbUrl = process.env.DB_URL;
+const dbUrl = 'mongodb://localhost:27017/yelp-camp';
 
-
-mongoose.connect('mongodb://localhost:27017/yelp-camp', {
+mongoose.connect(dbUrl, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
@@ -52,7 +55,18 @@ app.use(mongoSanitize({
     replaceWith: '_'
 }))
 
+const store = new MongoDBStore({//makes the store
+    url:dbUrl ,
+    secret: 'thisshouldbeabettersecret!',
+    touchAfter: 24*60*60//cuts unneccessary resaves when user refreshes the page--see Lazy session update in the mongo docs--lecture 569--24 hours * 60 minutes * 60 seconds
+});
+
+store.on('error', function (e) {
+    console.log("SESSION STORE ERROR", e)
+})
+
 const sessionConfig = {
+    store,
     name: 'session',
     secret: 'thisshouldbeabettersecret!',
     resave: false,
@@ -60,7 +74,7 @@ const sessionConfig = {
     cookie: {
         httpOnly: true,
         // secure: true,
-        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,//this formula if for milliseconds and the touchAfter above is seconds
         maxAge: 1000 * 60 * 60 * 24 * 7
     }
 }
